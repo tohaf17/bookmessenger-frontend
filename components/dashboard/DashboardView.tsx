@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Bookmark, CheckCircle2, Loader2, TrendingUp } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import AdminRedirect from '@/components/common/AdminRedirect';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
@@ -101,6 +102,7 @@ export default function DashboardView() {
 
   return (
     <div className={css.appContainer}>
+      <AdminRedirect />
       <Navbar />
       <main className={css.main}>
         <div className={css.header}>

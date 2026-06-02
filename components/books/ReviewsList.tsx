@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Loader2, Star } from 'lucide-react';
+import { Loader2, Star, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { useT } from '@/lib/translations';
 import type { Review } from './types';
 import css from './BookDetails.module.css';
@@ -7,23 +7,31 @@ import css from './BookDetails.module.css';
 interface ReviewsListProps {
   reviews: Review[];
   canReview: boolean;
+  canVote: boolean;
   reviewContent: string;
   reviewRating: number;
   submittingReview: boolean;
+  votingReview: { reviewId: number; action: 'like' | 'dislike' } | null;
+  reviewVotes: Record<number, 'like' | 'dislike'>;
   onReviewContentChange: (value: string) => void;
   onRatingChange: (value: number) => void;
   onSubmitReview: (event: React.FormEvent) => void;
+  onVoteReview: (reviewId: number, action: 'like' | 'dislike') => void;
 }
 
 export default function ReviewsList({
   reviews,
   canReview,
+  canVote,
   reviewContent,
   reviewRating,
   submittingReview,
+  votingReview,
+  reviewVotes,
   onReviewContentChange,
   onRatingChange,
   onSubmitReview,
+  onVoteReview,
 }: ReviewsListProps) {
   const t = useT();
 
@@ -74,6 +82,36 @@ export default function ReviewsList({
                 <span className={css.commentDate}>{new Date(review.createdAt).toLocaleDateString()}</span>
               </div>
               <p className={css.reviewTextContent}>{review.content}</p>
+              <div className={css.reviewFeedbackRow}>
+                <button
+                  type="button"
+                  onClick={() => onVoteReview(review.id, 'like')}
+                  className={`${css.reviewVoteBtn} ${reviewVotes[review.id] === 'like' ? css.reviewVoteBtnActive : ''}`}
+                  disabled={!canVote || Boolean(reviewVotes[review.id]) || votingReview?.reviewId === review.id}
+                  title={t('books.helpful')}
+                >
+                  {votingReview?.reviewId === review.id && votingReview.action === 'like' ? (
+                    <Loader2 size={14} className={css.spinner} />
+                  ) : (
+                    <ThumbsUp size={14} />
+                  )}
+                  <span>{review.likesCount || 0}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onVoteReview(review.id, 'dislike')}
+                  className={`${css.reviewVoteBtn} ${reviewVotes[review.id] === 'dislike' ? css.reviewVoteBtnActive : ''}`}
+                  disabled={!canVote || Boolean(reviewVotes[review.id]) || votingReview?.reviewId === review.id}
+                  title={t('books.notHelpful')}
+                >
+                  {votingReview?.reviewId === review.id && votingReview.action === 'dislike' ? (
+                    <Loader2 size={14} className={css.spinner} />
+                  ) : (
+                    <ThumbsDown size={14} />
+                  )}
+                  <span>{review.dislikesCount || 0}</span>
+                </button>
+              </div>
             </div>
           ))
         )}

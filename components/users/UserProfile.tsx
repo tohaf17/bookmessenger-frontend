@@ -4,6 +4,7 @@ import { use, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import AdminRedirect from '@/components/common/AdminRedirect';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
@@ -88,7 +89,7 @@ export default function UserProfile({ params }: PageProps) {
         const statsRes = await api.get(`/users/${targetUserId}/stats`);
         setStats(statsRes.data);
       } catch {
-        setStats({ booksReadCount: 0, currentlyReadingCount: 0, wantToReadCount: 0 });
+        setStats({ readCount: 0, currentlyReadingCount: 0, wantToReadCount: 0 });
       }
     } catch (err) {
       console.error('Failed to load profile data', err);
@@ -127,6 +128,7 @@ export default function UserProfile({ params }: PageProps) {
 
   return (
     <div className={css.appContainer}>
+      <AdminRedirect />
       <Navbar />
       <main className={css.main}>
         <Link href="/users" className={css.backBtn}>

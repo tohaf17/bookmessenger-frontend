@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Award, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import AdminRedirect from '@/components/common/AdminRedirect';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
@@ -109,6 +110,7 @@ export default function TrackersView() {
 
   return (
     <div className={css.appContainer}>
+      <AdminRedirect />
       <Navbar />
       <main className={css.main}>
         <div className={css.header}>

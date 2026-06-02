@@ -7,7 +7,8 @@ export interface UserProfileData {
 }
 
 export interface UserStats {
-  booksReadCount: number;
+  readCount: number;
+  booksReadCount?: number;
   currentlyReadingCount: number;
   wantToReadCount: number;
 }

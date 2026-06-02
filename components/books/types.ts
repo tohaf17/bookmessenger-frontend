@@ -36,6 +36,8 @@ export interface Review {
   id: number;
   content: string;
   rating: number;
+  likesCount: number;
+  dislikesCount: number;
   createdAt: string;
   user: {
     id: number;

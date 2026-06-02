@@ -44,6 +44,8 @@ export const booksTranslations = {
   'books.reviewPlaceholder': { uk: 'Напишіть детальний відгук про книгу...', en: 'Write a complete review...' },
   'books.submitReview': { uk: 'Надіслати відгук', en: 'Submit review' },
   'books.noReviews': { uk: 'Рецензій ще немає. Станьте першим!', en: 'No reviews yet. Be the first!' },
+  'books.helpful': { uk: 'Корисно', en: 'Helpful' },
+  'books.notHelpful': { uk: 'Не корисно', en: 'Not helpful' },
   'books.searchGoogle': { uk: 'Пошук у Google Books', en: 'Search Google Books' },
   'books.searchGooglePlaceholder': { uk: 'Введіть назву книги для пошуку...', en: 'Enter book title to search...' },
   'books.addFromGoogle': { uk: 'Додати до каталогу', en: 'Add to catalog' },

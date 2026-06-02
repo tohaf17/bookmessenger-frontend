@@ -3,6 +3,7 @@
 import css from './ReaderDirectory.module.css';
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/Navbar';
+import AdminRedirect from '@/components/common/AdminRedirect';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
@@ -53,6 +54,7 @@ export default function ReadersDirectory() {
 
   return (
     <div className={css.appContainer}>
+      <AdminRedirect />
       <Navbar />
 
       <main className={css.main}>

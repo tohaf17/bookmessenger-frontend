@@ -9,6 +9,7 @@ interface ReadingStatsProps {
 
 export default function ReadingStats({ stats }: ReadingStatsProps) {
   const t = useT();
+  const booksReadCount = stats?.readCount ?? stats?.booksReadCount ?? 0;
 
   return (
     <div className={`glass-panel ${css.statsCard}`}>
@@ -16,7 +17,7 @@ export default function ReadingStats({ stats }: ReadingStatsProps) {
         <Award size={18} color="#9333ea" />
         {t('users.stats')}
       </h3>
-      <StatLine tone="green" icon={<CheckCircle2 size={16} color="#10b981" />} value={stats?.booksReadCount || 0} label={t('users.booksRead')} />
+      <StatLine tone="green" icon={<CheckCircle2 size={16} color="#10b981" />} value={booksReadCount} label={t('users.booksRead')} />
       <StatLine tone="purple" icon={<TrendingUp size={16} color="#9333ea" />} value={stats?.currentlyReadingCount || 0} label={t('users.reading')} />
       <StatLine tone="blue" icon={<Bookmark size={16} color="#3b82f6" />} value={stats?.wantToReadCount || 0} label={t('dashboard.wishlist')} />
     </div>

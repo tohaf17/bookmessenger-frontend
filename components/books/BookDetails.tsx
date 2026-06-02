@@ -4,6 +4,7 @@ import React, { use, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { BookOpen, ChevronLeft, Loader2, MessageSquare, Star } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import AdminRedirect from '@/components/common/AdminRedirect';
 import TabSwitcher from '@/components/common/TabSwitcher';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
@@ -24,6 +25,7 @@ type ActiveTab = 'comments' | 'reviews';
 export default function BookDetails({ params }: PageProps) {
   const bookId = Number(use(params).id);
   const { user } = useAuthStore();
+  const isAdmin = String(user?.role).toLowerCase() === 'admin';
   const t = useT();
   const [details, setDetails] = useState<BookDetailsData | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -36,11 +38,14 @@ export default function BookDetails({ params }: PageProps) {
   const [reviewContent, setReviewContent] = useState('');
   const [reviewRating, setReviewRating] = useState(5);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [votingReview, setVotingReview] = useState<{ reviewId: number; action: 'like' | 'dislike' } | null>(null);
+  const [reviewVotes, setReviewVotes] = useState<Record<number, 'like' | 'dislike'>>({});
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [replyToId, setReplyToId] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [submittingReply, setSubmittingReply] = useState(false);
+  const votesStorageKey = `review-votes:${user?.id ?? 'guest'}`;
 
   const loadAllDetails = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
@@ -51,7 +56,15 @@ export default function BookDetails({ params }: PageProps) {
       setReadPages(detailsRes.data.currentUserBook?.readPages || 0);
 
       const reviewsRes = await api.get('/reviews', { params: { page: 1, quantity: 50 } });
-      setReviews((reviewsRes.data?.data || reviewsRes.data || []).filter((r: any) => r.bookId === bookId || r.book?.id === bookId));
+      setReviews(
+        (reviewsRes.data?.data || reviewsRes.data || [])
+          .filter((r: any) => r.bookId === bookId || r.book?.id === bookId)
+          .map((review: any) => ({
+            ...review,
+            likesCount: review.likesCount ?? 0,
+            dislikesCount: review.dislikesCount ?? 0,
+          })),
+      );
 
       const commentsRes = await api.get('/comments', { params: { bookId, page: 1, quantity: 50 } });
       setComments(commentsRes.data?.data || commentsRes.data || []);
@@ -66,6 +79,24 @@ export default function BookDetails({ params }: PageProps) {
   useEffect(() => {
     loadAllDetails(true);
   }, [loadAllDetails]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const rawVotes = window.localStorage.getItem(votesStorageKey);
+      setReviewVotes(rawVotes ? JSON.parse(rawVotes) : {});
+    } catch {
+      setReviewVotes({});
+    }
+  }, [votesStorageKey]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(votesStorageKey, JSON.stringify(reviewVotes));
+    } catch {
+    }
+  }, [reviewVotes, votesStorageKey]);
 
   const handleUpdateShelf = async () => {
     if (!details) return;
@@ -114,6 +145,45 @@ export default function BookDetails({ params }: PageProps) {
     }
   };
 
+  const handleVoteReview = async (reviewId: number, action: 'like' | 'dislike') => {
+    if (reviewVotes[reviewId]) return;
+    setVotingReview({ reviewId, action });
+    
+    try {
+      const res = await api.post(`/reviews/${reviewId}/${action}`);
+      const updatedReview = res.data;
+
+      setReviews((currentReviews) =>
+        currentReviews.map((review) => {
+          if (review.id !== reviewId) return review;
+
+          const currentLikes = review.likesCount ?? 0;
+          const currentDislikes = review.dislikesCount ?? 0;
+
+          const hasLikesCount = updatedReview && typeof updatedReview === 'object' && 'likesCount' in updatedReview;
+          const hasDislikesCount = updatedReview && typeof updatedReview === 'object' && 'dislikesCount' in updatedReview;
+
+          return {
+            ...review,
+            likesCount: hasLikesCount 
+              ? updatedReview.likesCount 
+              : (action === 'like' ? currentLikes + 1 : currentLikes),
+            dislikesCount: hasDislikesCount 
+              ? updatedReview.dislikesCount 
+              : (action === 'dislike' ? currentDislikes + 1 : currentDislikes),
+          };
+        }),
+      );
+      
+      setReviewVotes((currentVotes) => ({ ...currentVotes, [reviewId]: action }));
+    } catch (err: any) {
+      console.error('Помилка при кліку на лайк/дизлайк:', err);
+      alert(err.response?.data?.message || t('books.reviewFailed'));
+    } finally {
+      setVotingReview(null);
+    }
+  };
+
   const handlePostComment = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!newComment) return;
@@ -153,6 +223,7 @@ export default function BookDetails({ params }: PageProps) {
 
   return (
     <div className={css.appContainer}>
+      <AdminRedirect />
       <Navbar />
       <main className={css.main}>
         <Link href="/books" className={css.backBtn}>
@@ -162,20 +233,20 @@ export default function BookDetails({ params }: PageProps) {
 
         <div className={css.columns}>
           <aside className={css.leftCol}>
-            <ShelfSelector
-              book={book}
-              averageRating={averageRating}
-              reviewsCount={reviewsCount}
-              currentUserBook={currentUserBook}
-              shelfStatus={shelfStatus}
-              readPages={readPages}
-              updatingShelf={updatingShelf}
-              showShelf={Boolean(user)}
-              onStatusChange={setShelfStatus}
-              onReadPagesChange={setReadPages}
-              onSave={handleUpdateShelf}
-              onRemove={handleRemoveFromShelf}
-            />
+              <ShelfSelector
+                book={book}
+                averageRating={averageRating}
+                reviewsCount={reviewsCount}
+                currentUserBook={currentUserBook}
+                shelfStatus={shelfStatus}
+                readPages={readPages}
+                updatingShelf={updatingShelf}
+                showShelf={Boolean(user) && !isAdmin}
+                onStatusChange={setShelfStatus}
+                onReadPagesChange={setReadPages}
+                onSave={handleUpdateShelf}
+                onRemove={handleRemoveFromShelf}
+              />
           </aside>
 
           <section className={css.rightCol}>
@@ -208,13 +279,17 @@ export default function BookDetails({ params }: PageProps) {
               ) : (
                 <ReviewsList
                   reviews={reviews}
-                  canReview={Boolean(user)}
+                  canReview={Boolean(user) && !isAdmin}
+                  canVote={Boolean(user) && !isAdmin}
                   reviewContent={reviewContent}
                   reviewRating={reviewRating}
                   submittingReview={submittingReview}
+                  votingReview={votingReview}
+                  reviewVotes={reviewVotes}
                   onReviewContentChange={setReviewContent}
                   onRatingChange={setReviewRating}
                   onSubmitReview={handlePostReview}
+                  onVoteReview={handleVoteReview}
                 />
               )}
             </div>

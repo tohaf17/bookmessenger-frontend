@@ -21,6 +21,10 @@ export default function Navbar() {
     }
   }, [token, user, fetchMe]);
 
+  if (String(user?.role).toLowerCase() === 'admin') {
+    return null;
+  }
+
   const handleLogout = () => {
     logout();
     router.push('/auth/login');

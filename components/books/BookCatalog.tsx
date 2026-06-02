@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import AdminRedirect from '@/components/common/AdminRedirect';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
@@ -14,6 +15,7 @@ import css from './BookCatalog.module.css';
 
 export default function BookCatalog() {
   const { user } = useAuthStore();
+  const isAdmin = String(user?.role).toLowerCase() === 'admin';
   const t = useT();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,8 +68,8 @@ export default function BookCatalog() {
   };
 
   const handleAddToShelf = async (bookId: number, status: string) => {
-    if (!user) {
-      alert(t('books.addLogin'));
+    if (!user || isAdmin) {
+      alert(isAdmin ? 'Адміністратор не використовує полички або трекери' : t('books.addLogin'));
       return;
     }
     setAddingToShelf(bookId);
@@ -84,6 +86,7 @@ export default function BookCatalog() {
 
   return (
     <div className={css.appContainer}>
+      <AdminRedirect />
       <Navbar />
       <main className={css.main}>
         <div className={css.header}>
@@ -108,7 +111,7 @@ export default function BookCatalog() {
           onAuthorChange={updateFilter(setAuthor)}
         />
 
-        {user && (
+        {user && !isAdmin && (
           <GoogleBookSearch onBookAdded={fetchBooks} />
         )}
 

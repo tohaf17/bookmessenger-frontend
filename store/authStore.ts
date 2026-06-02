@@ -15,9 +15,9 @@ interface AuthState {
   token: string | null;
   loading: boolean;
   error: string | null;
-  login: (token: string) => Promise<void>;
+  login: (token: string) => Promise<User | null>;
   logout: () => void;
-  fetchMe: () => Promise<void>;
+  fetchMe: () => Promise<User | null>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -29,14 +29,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   login: async (token: string) => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('token', token);
+      document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax`;
     }
     set({ token, error: null });
-    await get().fetchMe();
+    if (api.defaults?.headers?.common) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    return await get().fetchMe();
   },
 
   logout: () => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
+      document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
     }
     set({ user: null, token: null });
   },
@@ -45,10 +50,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const res = await api.get('/auth/me');
-      set({ user: res.data, loading: false });
+      const userData = res.data
+        ? { ...res.data, role: String(res.data.role).toLowerCase() }
+        : null;
+      set({
+        user: userData,
+        loading: false,
+      });
+      return userData;
     } catch (err: any) {
       console.error('Fetch me failed', err);
-      
       if (err.response?.status === 401) {
         get().logout();
       }
@@ -57,6 +68,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         loading: false, 
         user: null 
       });
+      return null;
     }
   },
 }));
