@@ -62,4 +62,5 @@ jobs:
           app-name: 'bookmessenger-frontend'
           slot-name: 'Production'
           package: .
+          clean: true.
           
