@@ -1,0 +1,33 @@
+.group {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  color: #d1d5db;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  position: absolute;
+  left: 14px;
+  display: inline-flex;
+  color: var(--text-dark);
+  pointer-events: none;
+}
+
+.withIcon {
+  padding-left: 44px;
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.75rem;
+}

@@ -1,0 +1,16 @@
+.stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.starButton {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.starButton:disabled {
+  cursor: default;
+}

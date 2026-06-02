@@ -1,0 +1,47 @@
+.section {
+  z-index: 1;
+  width: 100%;
+  margin: 20px 0 60px;
+}
+
+.title {
+  margin-bottom: 40px;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.card h3 {
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.iconBox {
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  place-items: center;
+}

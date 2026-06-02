@@ -1,0 +1,12 @@
+.container {
+  min-height: 240px;
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  color: var(--text-muted);
+}
+
+.spinner {
+  color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}

@@ -1,0 +1,151 @@
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: rgba(13, 15, 20, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(12px);
+}
+
+.navContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.logo,
+.navLink,
+.loginBtn,
+.registerBtn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.logo {
+  gap: 8px;
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+
+.logoText {
+  letter-spacing: 0;
+}
+
+.logoAccent {
+  color: var(--primary-color);
+}
+
+.navLinks {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.navLink {
+  gap: 6px;
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.activeLink {
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.authSection,
+.userContainer,
+.guestButtons {
+  display: flex;
+  align-items: center;
+}
+
+.authSection {
+  gap: 12px;
+}
+
+.userContainer {
+  gap: 14px;
+}
+
+.username {
+  font-size: 0.9rem;
+  color: #e5e7eb;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.logoutBtn {
+  background: transparent;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: var(--error);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.guestButtons {
+  gap: 10px;
+}
+
+.loginBtn {
+  color: var(--text-main);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 12px;
+  border-radius: 6px;
+  gap: 6px;
+}
+
+.registerBtn {
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(147, 51, 234, 0.2);
+  gap: 6px;
+}
+
+@media (max-width: 760px) {
+  .nav {
+    height: auto;
+    padding: 12px 16px;
+  }
+
+  .navContainer {
+    flex-wrap: wrap;
+  }
+
+  .navLinks {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    overflow-x: auto;
+  }
+
+  .username {
+    display: none;
+  }
+}

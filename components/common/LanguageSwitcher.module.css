@@ -1,0 +1,22 @@
+.switcher {
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.switcher:hover {
+  background: rgba(147, 51, 234, 0.14);
+  border-color: rgba(147, 51, 234, 0.45);
+  transform: translateY(-1px);
+}

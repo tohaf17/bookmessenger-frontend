@@ -1,0 +1,46 @@
+.appContainer {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--bg-color);
+  color: var(--text-main);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lightOne,
+.lightTwo {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lightOne {
+  width: 450px;
+  height: 450px;
+  top: -50px;
+  left: 10%;
+  background: rgba(147, 51, 234, 0.08);
+  filter: blur(100px);
+}
+
+.lightTwo {
+  width: 500px;
+  height: 500px;
+  top: 300px;
+  right: 5%;
+  background: rgba(59, 130, 246, 0.07);
+  filter: blur(120px);
+}

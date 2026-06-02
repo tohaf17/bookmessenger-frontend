@@ -1,0 +1,527 @@
+.appContainer {
+  min-height: 100vh;
+  background: #0d0f14;
+  color: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 30px 24px;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #9ca3af;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 24px;
+  transition: color 0.2s ease;
+}
+
+.columns {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.leftCol {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.rightCol {
+  flex: 2.2;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.coverPanel {
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+  aspect-ratio: 0.7;
+  background: rgba(22, 28, 38, 0.4);
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+}
+
+.coverPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ratingOverview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  text-align: center;
+}
+
+.ratingValue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.averageRating {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.ratingMeta {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.shelfPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+.shelfTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ffffff;
+}
+
+.shelfInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shelfLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+.shelfSelect {
+  cursor: pointer;
+}
+
+.progressBarWrapper {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #9333ea, #3b82f6);
+  border-radius: 3px;
+}
+
+.shelfActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.shelfSubmitBtn {
+  flex: 1;
+  height: 38px;
+  font-size: 0.85rem;
+}
+
+.shelfRemoveBtn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.descPanel {
+  padding: 30px;
+}
+
+.genreTag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #c084fc;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.bookTitle {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.bookAuthor {
+  font-size: 1rem;
+  color: #9ca3af;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.metaRow {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.metaItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 4px 12px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 20px 0;
+}
+
+.descTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.descText {
+  font-size: 0.95rem;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+
+.tabHeader {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding-bottom: 2px;
+  margin-top: 10px;
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tabBtnActive {
+  color: #9333ea;
+  border-bottom: 2px solid #9333ea;
+}
+
+.tabContent {
+  margin-top: 10px;
+}
+
+.commentsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.commentForm {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sectionHeader {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.commentInputGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.commentTextarea {
+  flex: 1;
+  height: 60px;
+  resize: none;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+}
+
+.commentSubmitBtn {
+  width: 60px;
+  height: 60px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.commentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.commentCard {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.commentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.commentUser {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.commentDate {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.commentTextContent {
+  font-size: 0.9rem;
+  color: #d1d5db;
+  line-height: 1.5;
+}
+
+.commentActions {
+  display: flex;
+  gap: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding-top: 8px;
+}
+
+.replyActionBtn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+}
+
+.replyForm {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: rgba(0,0,0,0.15);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.03);
+}
+
+.replyTextarea {
+  height: 50px;
+  resize: none;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+}
+
+.replyFormButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.replyCancelBtn {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.replySubmitBtn {
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.repliesList {
+  margin-top: 12px;
+  padding-left: 20px;
+  border-left: 2px solid rgba(147, 51, 234, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.replyCard {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.reviewsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.reviewForm {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reviewRatingSelector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ratingSelectLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9ca3af;
+}
+
+.starsWrapper {
+  display: flex;
+  gap: 4px;
+}
+
+.starSelectBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+}
+
+.reviewTextarea {
+  height: 100px;
+  resize: vertical;
+  font-size: 0.9rem;
+  padding: 12px 16px;
+}
+
+.reviewSubmitBtn {
+  align-self: flex-end;
+  height: 38px;
+  font-size: 0.85rem;
+  padding: 0 20px;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.reviewCard {
+  padding: 20px;
+}
+
+.reviewCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.cardStars {
+  display: flex;
+  gap: 2px;
+}
+
+.reviewTextContent {
+  font-size: 0.95rem;
+  color: #d1d5db;
+  line-height: 1.6;
+}
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 120px 0;
+  color: #9ca3af;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 100px 0;
+  text-align: center;
+}
+
+.emptyText {
+  text-align: center;
+  color: #6b7280;
+  padding: 40px 0;
+  font-size: 0.9rem;
+}

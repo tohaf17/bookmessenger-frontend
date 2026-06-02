@@ -1,0 +1,253 @@
+'use client';
+
+import React, { use, useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { BookOpen, ChevronLeft, Loader2, MessageSquare, Star } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import TabSwitcher from '@/components/common/TabSwitcher';
+import { api } from '@/lib/api';
+import { useT } from '@/lib/translations';
+import { useAuthStore } from '@/store/authStore';
+import BookInfo from './BookInfo';
+import DiscussionsList from './DiscussionsList';
+import ReviewsList from './ReviewsList';
+import ShelfSelector from './ShelfSelector';
+import type { BookDetailsData, Comment, Review } from './types';
+import css from './BookDetails.module.css';
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+type ActiveTab = 'comments' | 'reviews';
+
+export default function BookDetails({ params }: PageProps) {
+  const bookId = Number(use(params).id);
+  const { user } = useAuthStore();
+  const t = useT();
+  const [details, setDetails] = useState<BookDetailsData | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('comments');
+  const [shelfStatus, setShelfStatus] = useState('');
+  const [readPages, setReadPages] = useState(0);
+  const [updatingShelf, setUpdatingShelf] = useState(false);
+  const [reviewContent, setReviewContent] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [newComment, setNewComment] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
+  const [replyToId, setReplyToId] = useState<number | null>(null);
+  const [replyContent, setReplyContent] = useState('');
+  const [submittingReply, setSubmittingReply] = useState(false);
+
+  const loadAllDetails = useCallback(async (showLoader = true) => {
+    if (showLoader) setLoading(true);
+    try {
+      const detailsRes = await api.get(`/books/${bookId}/details`);
+      setDetails(detailsRes.data);
+      setShelfStatus(detailsRes.data.currentUserBook?.status || '');
+      setReadPages(detailsRes.data.currentUserBook?.readPages || 0);
+
+      const reviewsRes = await api.get('/reviews', { params: { page: 1, quantity: 50 } });
+      setReviews((reviewsRes.data?.data || reviewsRes.data || []).filter((r: any) => r.bookId === bookId || r.book?.id === bookId));
+
+      const commentsRes = await api.get('/comments', { params: { bookId, page: 1, quantity: 50 } });
+      setComments(commentsRes.data?.data || commentsRes.data || []);
+    } catch (err) {
+      console.error('Failed to load book info', err);
+      setDetails(null);
+    } finally {
+      if (showLoader) setLoading(false);
+    }
+  }, [bookId]);
+
+  useEffect(() => {
+    loadAllDetails(true);
+  }, [loadAllDetails]);
+
+  const handleUpdateShelf = async () => {
+    if (!details) return;
+    setUpdatingShelf(true);
+    try {
+      const payload = { status: shelfStatus, readPages };
+      const res = details.currentUserBook
+        ? await api.patch(`/user-books/${details.currentUserBook.id}`, payload)
+        : await api.post('/user-books', { bookId, ...payload });
+      setDetails({ ...details, currentUserBook: res.data });
+      alert(t('books.shelfUpdated'));
+    } catch (err: any) {
+      alert(err.response?.data?.message || t('books.updateFailed'));
+    } finally {
+      setUpdatingShelf(false);
+    }
+  };
+
+  const handleRemoveFromShelf = async () => {
+    if (!details?.currentUserBook || !confirm(t('books.removeConfirm'))) return;
+    setUpdatingShelf(true);
+    try {
+      await api.delete(`/user-books/${details.currentUserBook.id}`);
+      setDetails({ ...details, currentUserBook: null });
+      setShelfStatus('');
+      setReadPages(0);
+    } catch (err: any) {
+      alert(err.response?.data?.message || t('books.removeFailed'));
+    } finally {
+      setUpdatingShelf(false);
+    }
+  };
+
+  const handlePostReview = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!reviewContent) return;
+    setSubmittingReview(true);
+    try {
+      await api.post('/reviews', { bookId, rating: reviewRating, text: reviewContent });
+      setReviewContent('');
+      await loadAllDetails(false);
+    } catch (err: any) {
+      alert(err.response?.data?.message || t('books.reviewFailed'));
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handlePostComment = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!newComment) return;
+    setSubmittingComment(true);
+    try {
+      await api.post('/comments', { bookId, text: newComment });
+      setNewComment('');
+      await loadAllDetails(false);
+    } catch (err: any) {
+      alert(err.response?.data?.message || t('books.commentFailed'));
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const handlePostReply = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!replyContent || replyToId === null) return;
+    setSubmittingReply(true);
+    try {
+      console.log('Sending reply:', { bookId, parentId: replyToId, content: replyContent });
+      await api.post('/comments/reply', { bookId, parentId: replyToId, content: replyContent });
+      setReplyContent('');
+      setReplyToId(null);
+      await loadAllDetails(false);
+    } catch (err: any) {
+      alert(err.response?.data?.message || t('books.replyFailed'));
+    } finally {
+      setSubmittingReply(false);
+    }
+  };
+
+  if (loading) return <BookDetailsState message={t('common.loadingBookInfo')} />;
+  if (!details) return <BookDetailsNotFound />;
+
+  const { book, averageRating, reviewsCount, commentsCount, currentUserBook } = details;
+
+  return (
+    <div className={css.appContainer}>
+      <Navbar />
+      <main className={css.main}>
+        <Link href="/books" className={css.backBtn}>
+          <ChevronLeft size={16} />
+          {t('books.backToCatalog')}
+        </Link>
+
+        <div className={css.columns}>
+          <aside className={css.leftCol}>
+            <ShelfSelector
+              book={book}
+              averageRating={averageRating}
+              reviewsCount={reviewsCount}
+              currentUserBook={currentUserBook}
+              shelfStatus={shelfStatus}
+              readPages={readPages}
+              updatingShelf={updatingShelf}
+              showShelf={Boolean(user)}
+              onStatusChange={setShelfStatus}
+              onReadPagesChange={setReadPages}
+              onSave={handleUpdateShelf}
+              onRemove={handleRemoveFromShelf}
+            />
+          </aside>
+
+          <section className={css.rightCol}>
+            <BookInfo book={book} />
+            <TabSwitcher
+              activeTab={activeTab}
+              onTabChange={(tab) => setActiveTab(tab as ActiveTab)}
+              tabs={[
+                { key: 'comments', label: `${t('books.discussion')} (${commentsCount})` },
+                { key: 'reviews', label: `${t('books.reviewList')} (${reviewsCount})` },
+              ]}
+            />
+            <div className={css.tabContent}>
+              {activeTab === 'comments' ? (
+                <DiscussionsList
+                  comments={comments}
+                  canComment={Boolean(user)}
+                  newComment={newComment}
+                  submittingComment={submittingComment}
+                  replyToId={replyToId}
+                  replyContent={replyContent}
+                  submittingReply={submittingReply}
+                  onNewCommentChange={setNewComment}
+                  onSubmitComment={handlePostComment}
+                  onToggleReply={(id) => setReplyToId(replyToId === id ? null : id)}
+                  onReplyChange={setReplyContent}
+                  onSubmitReply={handlePostReply}
+                  onCancelReply={() => setReplyToId(null)}
+                />
+              ) : (
+                <ReviewsList
+                  reviews={reviews}
+                  canReview={Boolean(user)}
+                  reviewContent={reviewContent}
+                  reviewRating={reviewRating}
+                  submittingReview={submittingReview}
+                  onReviewContentChange={setReviewContent}
+                  onRatingChange={setReviewRating}
+                  onSubmitReview={handlePostReview}
+                />
+              )}
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  );
+}
+
+function BookDetailsState({ message }: { message: string }) {
+  return (
+    <div className={css.appContainer}>
+      <Navbar />
+      <div className={css.loaderContainer}>
+        <Loader2 size={48} className={css.spinner} />
+        <p>{message}</p>
+      </div>
+    </div>
+  );
+}
+
+function BookDetailsNotFound() {
+  const t = useT();
+
+  return (
+    <div className={css.appContainer}>
+      <Navbar />
+      <div className={css.errorContainer}>
+        <BookOpen size={48} color="#4b5563" />
+        <h2>{t('books.notFound')}</h2>
+        <Link href="/books" className="btn-primary">{t('books.backToCatalog')}</Link>
+      </div>
+    </div>
+  );
+}
