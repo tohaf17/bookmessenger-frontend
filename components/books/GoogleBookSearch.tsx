@@ -18,6 +18,9 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<GoogleBookResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const quantity = 10;
+  const [totalItems, setTotalItems] = useState<number | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [addingId, setAddingId] = useState<string | null>(null);
   const [successId, setSuccessId] = useState<string | null>(null);
@@ -25,7 +28,7 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  const searchBooks = useCallback(async (searchQuery: string) => {
+  const searchBooks = useCallback(async (searchQuery: string, pageNum = 1) => {
     if (!searchQuery.trim() || searchQuery.trim().length < 2) {
       setResults([]);
       setShowDropdown(false);
@@ -35,10 +38,13 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
     setLoading(true);
     try {
       const res = await api.get('/books/search/google', {
-        params: { q: searchQuery.trim() },
+        params: { q: searchQuery.trim(), page: pageNum, quantity },
       });
-      const data = Array.isArray(res.data) ? res.data : [];
+      const payload = res.data || {};
+      const data = Array.isArray(payload) ? payload : payload.items || [];
+      const total = payload.totalItems ?? null;
       setResults(data);
+      setTotalItems(total);
       setShowDropdown(true);
     } catch (err) {
       console.error('Google Books search failed', err);
@@ -59,13 +65,19 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
     }
 
     debounceRef.current = setTimeout(() => {
-      searchBooks(query);
+      setPage(1);
+      searchBooks(query, 1);
     }, 1000);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [query, searchBooks]);
+
+  useEffect(() => {
+    if (!query.trim() || query.trim().length < 2) return;
+    searchBooks(query, page);
+  }, [page]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -107,6 +119,39 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
     }
   };
 
+  const [showCustom, setShowCustom] = useState(false);
+  const [custom, setCustom] = useState({ title: '', authorName: '', genre: '', description: '', totalPages: '' });
+  const [coverDataUrl, setCoverDataUrl] = useState<string | null>(null);
+  const [coverFileName, setCoverFileName] = useState<string | null>(null);
+  const handleCoverFile = (file?: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCoverDataUrl(String(reader.result));
+    reader.readAsDataURL(file);
+    setCoverFileName(file.name);
+  };
+
+  const handleCreateCustom = async () => {
+    if (!custom.title.trim()) return alert('Title is required');
+    try {
+      const res = await api.post('/books', {
+        title: custom.title,
+        authorName: custom.authorName || 'Unknown',
+        genre: custom.genre || 'Інше',
+        description: custom.description || '',
+        totalPages: custom.totalPages ? Number(custom.totalPages) : undefined,
+        coverImageUrl: coverDataUrl || undefined,
+      });
+      setShowCustom(false);
+      setCustom({ title: '', authorName: '', genre: '', description: '', totalPages: '' });
+      setCoverDataUrl(null);
+      onBookAdded();
+      if (res.data?.id) router.push(`/books/${res.data.id}`);
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to create book');
+    }
+  };
+
   return (
     <div className={css.searchSection}>
       <h3 className={css.sectionTitle}>
@@ -126,11 +171,33 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
           />
           {loading && <Loader2 size={18} className={css.loadingIndicator} />}
         </div>
+        <div style={{ display: 'flex', gap: 8, marginTop: 8, alignItems: 'center' }}>
+          <button type="button" className="btn-primary" onClick={() => setShowCustom(true)}>
+            + {t('books.addFromGoogle') /* reuse label */}
+          </button>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button disabled={page <= 1} type="button" className="btn-secondary" onClick={() => setPage((p) => Math.max(1, p - 1))}>
+              Prev
+            </button>
+            <span className={css.pageIndicator}>{t('books.pageOf', { page, total: totalItems ? Math.ceil(totalItems / quantity) : '...' })}</span>
+            <button
+              disabled={results.length === 0 || (totalItems !== null && page * quantity >= totalItems)}
+              type="button"
+              className="btn-secondary"
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
 
         {showDropdown && (
           <div className={css.dropdown}>
             {results.length === 0 && !loading ? (
-              <div className={css.noResults}>{t('books.searchNoResults')}</div>
+              <div className={css.noResults} style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'center' }}>
+                <div>{t('books.searchNoResults')}</div>
+                <button type="button" className="btn-primary" onClick={() => { setShowCustom(true); setShowDropdown(false); }}>{t('books.createCustom') || 'Create custom book'}</button>
+              </div>
             ) : (
               results.map((book) => (
                 <div key={book.googleBooksId} className={css.resultItem}>
@@ -196,9 +263,44 @@ export default function GoogleBookSearch({ onBookAdded }: GoogleBookSearchProps)
                 </div>
               ))
             )}
+            {/* pagination footer inside dropdown */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+              <div />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button disabled={page <= 1} type="button" className="btn-secondary" onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</button>
+                <span style={{ color: '#ddd' }}>{t('books.pageOf', { page, total: totalItems ? Math.ceil(totalItems / quantity) : '...' })}</span>
+                <button disabled={results.length === 0 || (totalItems !== null && page * quantity >= totalItems)} type="button" className="btn-secondary" onClick={() => setPage((p) => p + 1)}>Next</button>
+              </div>
+              <div />
+            </div>
           </div>
         )}
       </div>
+      {showCustom && (
+        <div className={css.modalOverlay} onClick={() => setShowCustom(false)}>
+          <div className={css.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h3 className={css.modalTitle}>{t('books.createCustom') || 'Create custom book'}</h3>
+            <div className={css.modalGrid}>
+              <input className={css.modalInput} placeholder={t('books.createCustom.titlePlaceholder') || 'Title'} value={custom.title} onChange={(e) => setCustom({ ...custom, title: e.target.value })} />
+              <input className={css.modalInput} placeholder={t('books.createCustom.authorPlaceholder') || 'Author'} value={custom.authorName} onChange={(e) => setCustom({ ...custom, authorName: e.target.value })} />
+              <input className={css.modalInput} placeholder={t('books.createCustom.genrePlaceholder') || 'Genre'} value={custom.genre} onChange={(e) => setCustom({ ...custom, genre: e.target.value })} />
+              <input className={css.modalInput} placeholder={t('books.createCustom.pagesPlaceholder') || 'Pages'} type="number" value={custom.totalPages} onChange={(e) => setCustom({ ...custom, totalPages: e.target.value })} />
+            </div>
+            <textarea className={css.modalTextarea} placeholder={t('books.createCustom.descriptionPlaceholder') || 'Description'} value={custom.description} onChange={(e) => setCustom({ ...custom, description: e.target.value })} />
+            <div className={css.modalFileRow}>
+              <label style={{ color: '#cbd5e1' }}>{t('books.createCustom.uploadCover') || 'Upload cover'}</label>
+              <input id="custom-cover-input" className={css.modalFileInput} type="file" accept="image/*" onChange={(e) => handleCoverFile(e.target.files?.[0])} />
+              <button type="button" className={css.fileButton} onClick={() => document.getElementById('custom-cover-input')?.click()}>{t('books.createCustom.chooseFile') || 'Choose file'}</button>
+              <span className={css.fileName}>{coverFileName ?? t('books.createCustom.noFile') ?? 'No file chosen'}</span>
+              {coverDataUrl && <img className={css.modalCoverPreview} src={coverDataUrl} />}
+            </div>
+            <div className={css.modalActions}>
+              <button type="button" className="btn-secondary" onClick={() => setShowCustom(false)}>{t('books.createCustom.cancel') || 'Cancel'}</button>
+              <button type="button" className="btn-primary" onClick={handleCreateCustom}>{t('books.createCustom.create') || 'Create'}</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

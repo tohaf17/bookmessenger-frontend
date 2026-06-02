@@ -6,12 +6,13 @@ interface BookSearchBarProps {
   search: string;
   genre: string;
   author: string;
+  genres?: string[];
   onSearchChange: (value: string) => void;
   onGenreChange: (value: string) => void;
   onAuthorChange: (value: string) => void;
 }
 
-export default function BookSearchBar({ search, genre, author, onSearchChange, onGenreChange, onAuthorChange }: BookSearchBarProps) {
+export default function BookSearchBar({ search, genre, author, genres = [], onSearchChange, onGenreChange, onAuthorChange }: BookSearchBarProps) {
   const t = useT();
 
   return (
@@ -32,12 +33,18 @@ export default function BookSearchBar({ search, genre, author, onSearchChange, o
           <Filter size={16} className={css.filterIcon} />
           <select value={genre} onChange={(event) => onGenreChange(event.target.value)} className={`glass-input ${css.selectInput}`}>
             <option value="">{t('books.allGenres')}</option>
-            <option value="Художня література">Художня література</option>
-            <option value="Наукова фантастика">Наукова фантастика</option>
-            <option value="Фентезі">Фентезі</option>
-            <option value="Детектив">Детектив</option>
-            <option value="Психологія">Психологія</option>
-            <option value="Історія">Історія</option>
+            {genres.length === 0 ? (
+              <>
+                <option value="Художня література">Художня література</option>
+                <option value="Наукова фантастика">Наукова фантастика</option>
+                <option value="Фентезі">Фентезі</option>
+                <option value="Детектив">Детектив</option>
+                <option value="Психологія">Психологія</option>
+                <option value="Історія">Історія</option>
+              </>
+            ) : (
+              genres.map((g) => <option key={g} value={g}>{g}</option>)
+            )}
           </select>
         </div>
 

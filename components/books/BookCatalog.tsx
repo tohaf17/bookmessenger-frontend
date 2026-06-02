@@ -22,6 +22,7 @@ export default function BookCatalog() {
   const [author, setAuthor] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [genres, setGenres] = useState<string[]>([]);
   const [addingToShelf, setAddingToShelf] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -36,6 +37,8 @@ export default function BookCatalog() {
       const res = await api.get('/books', { params });
       setBooks(Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : []);
       setTotalPages(res.data?.pagination?.totalPages || 1);
+      // refresh genres list so new genres (from newly added books) appear
+      fetchGenres();
     } catch (err) {
       console.error('Failed to fetch books', err);
     } finally {
@@ -43,8 +46,18 @@ export default function BookCatalog() {
     }
   }, [page, search, genre, author]);
 
+  const fetchGenres = useCallback(async () => {
+    try {
+      const res = await api.get('/books/genres');
+      setGenres(Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      console.error('Failed to fetch genres', err);
+    }
+  }, []);
+
   useEffect(() => {
     fetchBooks();
+    fetchGenres();
   }, [fetchBooks]);
 
   const updateFilter = (setter: (value: string) => void) => (value: string) => {
@@ -89,6 +102,7 @@ export default function BookCatalog() {
           search={search}
           genre={genre}
           author={author}
+          genres={genres}
           onSearchChange={updateFilter(setSearch)}
           onGenreChange={updateFilter(setGenre)}
           onAuthorChange={updateFilter(setAuthor)}

@@ -237,3 +237,107 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Modal for creating custom book */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+.modalContent {
+  width: 720px;
+  max-width: 95%;
+  background: #0b1020;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.modalTitle {
+  margin-top: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.modalInput {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  color: #f3f4f6;
+  outline: none;
+}
+
+.modalInput:focus {
+  border-color: rgba(147,51,234,0.5);
+  box-shadow: 0 0 0 3px rgba(147,51,234,0.06);
+}
+
+.modalTextarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  min-height: 100px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px;
+  color: #f3f4f6;
+  outline: none;
+}
+
+.modalFileRow {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.modalFileInput {
+  color: #f3f4f6;
+  display: none;
+}
+
+.modalCoverPreview {
+  width: 80px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+.modalActions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.fileButton {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #f3f4f6;
+  cursor: pointer;
+}
+
+.fileName {
+  color: #9ca3af;
+  margin-left: 8px;
+  font-size: 0.9rem;
+}
