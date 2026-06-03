@@ -14,6 +14,7 @@ export { booksTranslations } from './translations/books';
 export { dashboardTranslations } from './translations/dashboard';
 export { trackersTranslations } from './translations/trackers';
 export { usersTranslations } from './translations/users';
+export { adminTranslations } from './translations/admin';
 
 const formatTranslation = (value: string, values?: Record<string, string | number>) => {
   if (!values) {

@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import AdminRedirect from '@/components/common/AdminRedirect';
 import TabSwitcher from '@/components/common/TabSwitcher';
 import { api } from '@/lib/api';
+import { isAdminUser } from '@/lib/auth';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
 import BookInfo from './BookInfo';
@@ -25,7 +26,7 @@ type ActiveTab = 'comments' | 'reviews';
 export default function BookDetails({ params }: PageProps) {
   const bookId = Number(use(params).id);
   const { user } = useAuthStore();
-  const isAdmin = String(user?.role).toLowerCase() === 'admin';
+  const isAdmin = isAdminUser(user);
   const t = useT();
   const [details, setDetails] = useState<BookDetailsData | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);

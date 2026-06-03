@@ -11,6 +11,8 @@ import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { BookOpen, User, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useLangStore } from '@/store/langStore';
+import { useAuthStore } from '@/store/authStore';
+import { isAdminUser } from '@/lib/auth';
 
 type RegisterFormValues = {
   name: string;
@@ -23,6 +25,7 @@ type RegisterFormValues = {
 export default function RegisterPage() {
   const router = useRouter();
   const t = useT();
+  const loginUser = useAuthStore((state) => state.login);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -64,11 +67,16 @@ export default function RegisterPage() {
     setIsLoading(true);
     setApiError(null);
     try {
-      await api.post('/auth/register', data);
+      const res = await api.post('/auth/register', data);
+      const token = res.data.accessToken;
+
+      if (!token) {
+        throw new Error('No access token returned');
+      }
+
+      const loggedUser = await loginUser(token);
       setIsSuccess(true);
-      setTimeout(() => {
-        router.push('/auth/login');
-      }, 2000);
+      router.replace(isAdminUser(loggedUser) ? '/admin' : '/');
     } catch (err: any) {
       console.error(err);
       setApiError(
@@ -220,4 +228,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

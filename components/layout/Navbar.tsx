@@ -7,6 +7,7 @@ import { BookOpen, LogOut, User, Compass, Target, LogIn, UserPlus } from 'lucide
 import LanguageSwitcher from '@/components/common/LanguageSwitcher';
 import { useAuthStore } from '@/store/authStore';
 import { useT } from '@/lib/translations';
+import { isAdminUser } from '@/lib/auth';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
@@ -21,7 +22,7 @@ export default function Navbar() {
     }
   }, [token, user, fetchMe]);
 
-  if (String(user?.role).toLowerCase() === 'admin') {
+  if (isAdminUser(user)) {
     return null;
   }
 

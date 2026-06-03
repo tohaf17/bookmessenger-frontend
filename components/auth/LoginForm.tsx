@@ -5,12 +5,14 @@ import React, { useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as zod from 'zod';
-import Link from 'next/navigation';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
 import { BookOpen, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useLangStore } from "@/store/langStore";
+import { isAdminUser } from '@/lib/auth';
 
 type LoginFormValues = {
   email: string;
@@ -18,6 +20,7 @@ type LoginFormValues = {
 };
 
 export default function LoginForm() {
+  const router = useRouter();
   const t = useT();
   const lang = useLangStore((state) => state.lang);
   const loginUser = useAuthStore((state) => state.login);
@@ -27,11 +30,7 @@ export default function LoginForm() {
 
   const loginSchema = useMemo(() => {
     return zod.object({
-      email: zod.union([
-        zod.string().email(t('auth.validation.email')),
-        zod.literal('admin@bookmessenger.com'),
-        zod.literal('admin@bookmessenger'),
-      ]),
+      email: zod.string().email(t('auth.validation.email')),
       password: zod.string().min(1, t('auth.validation.passwordRequired')),
     });
   }, [lang, t]);
@@ -52,27 +51,11 @@ export default function LoginForm() {
     setIsLoading(true);
     setApiError(null);
     try {
-      if (
-        (data.email === 'admin@bookmessenger.com' || data.email === 'admin@bookmessenger') && 
-        data.password === 'adminpassword123'
-      ) {
-        localStorage.setItem('isAdminHardcoded', 'true');
-        const tokenMock = 'hardcoded-admin-token';
-        await loginUser(tokenMock);
-        window.location.href = '/admin';
-        return;
-      }
-
       const res = await api.post('/auth/login', data);
       const token = res.data.accessToken;
       if (token) {
-        localStorage.removeItem('isAdminHardcoded');
         const loggedUser = await loginUser(token);
-        if (loggedUser?.role === 'admin') {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/';
-        }
+        router.replace(isAdminUser(loggedUser) ? '/admin' : '/');
       } else {
         throw new Error('No access token returned');
       }
@@ -94,10 +77,10 @@ export default function LoginForm() {
 
       <div className={`glass-panel ${css.card}`}>
         <div className={css.header}>
-          <a href="/" className={css.logo}>
+          <Link href="/" className={css.logo}>
             <BookOpen size={36} color="#9333ea" />
             <h1 className={css.logoText}>Book<span className={css.logoAccent}>Messenger</span></h1>
-          </a>
+          </Link>
           <p className={css.subtitle}>
             {t('auth.login.subtitle')}
           </p>

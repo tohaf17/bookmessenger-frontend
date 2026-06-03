@@ -5,6 +5,7 @@ import { BookOpen, CheckCircle2, ChevronLeft, ChevronRight, Loader2 } from 'luci
 import Navbar from '@/components/Navbar';
 import AdminRedirect from '@/components/common/AdminRedirect';
 import { api } from '@/lib/api';
+import { isAdminUser } from '@/lib/auth';
 import { useT } from '@/lib/translations';
 import { useAuthStore } from '@/store/authStore';
 import BookCard from './BookCard';
@@ -15,7 +16,7 @@ import css from './BookCatalog.module.css';
 
 export default function BookCatalog() {
   const { user } = useAuthStore();
-  const isAdmin = String(user?.role).toLowerCase() === 'admin';
+  const isAdmin = isAdminUser(user);
   const t = useT();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);

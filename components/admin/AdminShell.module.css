@@ -1,0 +1,146 @@
+.shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(147, 51, 234, 0.16), transparent 32%),
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.12), transparent 28%),
+    linear-gradient(180deg, #0d0f14 0%, #0b0d12 100%);
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(13, 15, 20, 0.8);
+  backdrop-filter: blur(14px);
+}
+
+.topbarInner {
+  width: 100%;
+  max-width: 1280px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.brandLogo {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.18), rgba(59, 130, 246, 0.18));
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  flex-shrink: 0;
+}
+
+.brandCopy {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.brandTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.brandSubtitle {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.badgeRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid rgba(147, 51, 234, 0.2);
+  background: rgba(147, 51, 234, 0.1);
+  color: #e9d5ff;
+}
+
+.userPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 7px 14px;
+}
+
+.logoutBtn {
+  height: 38px;
+  padding: 0 14px;
+}
+
+.content {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px 24px 48px;
+}
+
+.loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  gap: 14px;
+  color: var(--text-muted);
+}
+
+.loadingCard {
+  width: min(460px, calc(100vw - 32px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@media (max-width: 720px) {
+  .topbarInner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .badgeRow {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .content {
+    padding-inline: 16px;
+  }
+}

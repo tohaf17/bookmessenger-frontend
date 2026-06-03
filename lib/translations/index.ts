@@ -7,6 +7,7 @@ import { booksTranslations } from './books';
 import { dashboardTranslations } from './dashboard';
 import { trackersTranslations } from './trackers';
 import { usersTranslations } from './users';
+import { adminTranslations } from './admin';
 
 export const translations = {
   ...navTranslations,
@@ -17,6 +18,7 @@ export const translations = {
   ...dashboardTranslations,
   ...trackersTranslations,
   ...usersTranslations,
+  ...adminTranslations,
 } as const;
 
 export type TranslationKey = keyof typeof translations;

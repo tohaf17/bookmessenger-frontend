@@ -43,6 +43,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       localStorage.removeItem('token');
       document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax';
     }
+    if (api.defaults?.headers?.common) {
+      delete api.defaults.headers.common['Authorization'];
+    }
     set({ user: null, token: null });
   },
 

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
+import { isAdminUser } from '@/lib/auth';
 
 export default function AdminRedirect({ to = '/admin' }: { to?: string }) {
   const router = useRouter();
@@ -16,10 +17,10 @@ export default function AdminRedirect({ to = '/admin' }: { to?: string }) {
   }, [token, user, loading, fetchMe]);
 
   useEffect(() => {
-    if (String(user?.role).toLowerCase() === 'admin' && pathname !== to) {
+    if (isAdminUser(user) && pathname !== to) {
       router.replace(to);
     }
-  }, [pathname, router, to, user?.role]);
+  }, [pathname, router, to, user]);
 
   return null;
 }
