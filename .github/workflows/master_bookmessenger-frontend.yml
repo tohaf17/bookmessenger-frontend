@@ -52,9 +52,6 @@ jobs:
         with:
           name: node-app
 
-      - name: Delete .gitignore to force Azure to keep .next folder
-        run: rm -f .gitignore
-        
       - name: Login to Azure
         uses: azure/login@v2
         with:
