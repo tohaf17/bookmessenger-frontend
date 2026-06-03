@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
-    "start": "next start -p 8080"
+    "start": "next start -p 8080",
+    "postinstall": "next build" 
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
