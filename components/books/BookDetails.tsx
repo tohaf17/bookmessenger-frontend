@@ -51,24 +51,39 @@ export default function BookDetails({ params }: PageProps) {
   const loadAllDetails = useCallback(async (showLoader = true) => {
     if (showLoader) setLoading(true);
     try {
-      const detailsRes = await api.get(`/books/${bookId}/details`);
-      setDetails(detailsRes.data);
-      setShelfStatus(detailsRes.data.currentUserBook?.status || '');
-      setReadPages(detailsRes.data.currentUserBook?.readPages || 0);
+      const [detailsRes, reviewsRes, commentsRes] = await Promise.allSettled([
+        api.get(`/books/${bookId}/details`),
+        api.get('/reviews', { params: { page: 1, quantity: 50, bookId } }),
+        api.get('/comments', { params: { bookId, page: 1, quantity: 50 } }),
+      ]);
 
-      const reviewsRes = await api.get('/reviews', { params: { page: 1, quantity: 50 } });
-      setReviews(
-        (reviewsRes.data?.data || reviewsRes.data || [])
-          .filter((r: any) => r.bookId === bookId || r.book?.id === bookId)
-          .map((review: any) => ({
+      if (detailsRes.status === 'fulfilled') {
+        setDetails(detailsRes.value.data);
+        setShelfStatus(detailsRes.value.data.currentUserBook?.status || '');
+        setReadPages(detailsRes.value.data.currentUserBook?.readPages || 0);
+      } else {
+        throw detailsRes.reason;
+      }
+
+      if (reviewsRes.status === 'fulfilled') {
+        setReviews(
+          (reviewsRes.value.data?.data || reviewsRes.value.data || []).map((review: any) => ({
             ...review,
             likesCount: review.likesCount ?? 0,
             dislikesCount: review.dislikesCount ?? 0,
           })),
-      );
+        );
+      } else {
+        console.error('Failed to load reviews', reviewsRes.reason);
+        setReviews([]);
+      }
 
-      const commentsRes = await api.get('/comments', { params: { bookId, page: 1, quantity: 50 } });
-      setComments(commentsRes.data?.data || commentsRes.data || []);
+      if (commentsRes.status === 'fulfilled') {
+        setComments(commentsRes.value.data?.data || commentsRes.value.data || []);
+      } else {
+        console.error('Failed to load comments', commentsRes.reason);
+        setComments([]);
+      }
     } catch (err) {
       console.error('Failed to load book info', err);
       if (showLoader) {

@@ -20,6 +20,8 @@ interface AuthState {
   fetchMe: () => Promise<User | null>;
 }
 
+let fetchMeInFlight: Promise<User | null> | null = null;
+
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
@@ -50,28 +52,38 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   fetchMe: async () => {
-    set({ loading: true, error: null });
-    try {
-      const res = await api.get('/auth/me');
-      const userData = res.data
-        ? { ...res.data, role: String(res.data.role).toLowerCase() }
-        : null;
-      set({
-        user: userData,
-        loading: false,
-      });
-      return userData;
-    } catch (err: any) {
-      console.error('Fetch me failed', err);
-      if (err.response?.status === 401) {
-        get().logout();
-      }
-      set({ 
-        error: err.response?.data?.message || 'Failed to fetch user info', 
-        loading: false, 
-        user: null 
-      });
-      return null;
+    if (fetchMeInFlight) {
+      return fetchMeInFlight;
     }
+
+    fetchMeInFlight = (async () => {
+      set({ loading: true, error: null });
+      try {
+        const res = await api.get('/auth/me');
+        const userData = res.data
+          ? { ...res.data, role: String(res.data.role).toLowerCase() }
+          : null;
+        set({
+          user: userData,
+          loading: false,
+        });
+        return userData;
+      } catch (err: any) {
+        console.error('Fetch me failed', err);
+        if (err.response?.status === 401) {
+          get().logout();
+        }
+        set({
+          error: err.response?.data?.message || 'Failed to fetch user info',
+          loading: false,
+          user: null,
+        });
+        return null;
+      } finally {
+        fetchMeInFlight = null;
+      }
+    })();
+
+    return fetchMeInFlight;
   },
 }));
