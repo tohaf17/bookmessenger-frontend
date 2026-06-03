@@ -28,16 +28,19 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+
       - name: Copy static files to standalone
         run: |
-          cp -r .next/static .next/standalone/.next/
-          cp -r public .next/standalone/ || true
+          # Тепер копіюємо з build в build/standalone/build/
+          cp -r build/static build/standalone/build/
+          cp -r public build/standalone/ || true
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .next/standalone
+          # Завантажуємо папку standalone з нового місця
+          path: build/standalone
 
   deploy:
     runs-on: ubuntu-latest
