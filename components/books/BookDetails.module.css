@@ -99,6 +99,47 @@
   color: #9ca3af;
 }
 
+.shelfStatsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+}
+
+.shelfStatsTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.shelfStatsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.shelfStatCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.shelfStatValue {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.shelfStatLabel {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  line-height: 1.2;
+}
+
 .shelfPanel {
   display: flex;
   flex-direction: column;
@@ -564,4 +605,10 @@
   color: #6b7280;
   padding: 40px 0;
   font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .shelfStatsGrid {
+    grid-template-columns: 1fr;
+  }
 }

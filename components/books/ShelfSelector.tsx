@@ -7,6 +7,9 @@ interface ShelfSelectorProps {
   book: Book;
   averageRating: number;
   reviewsCount: number;
+  readRightNowCount: number;
+  wantToReadCount: number;
+  alreadyReadCount: number;
   currentUserBook: UserBook | null;
   shelfStatus: string;
   readPages: number;
@@ -22,6 +25,9 @@ export default function ShelfSelector({
   book,
   averageRating,
   reviewsCount,
+  readRightNowCount,
+  wantToReadCount,
+  alreadyReadCount,
   currentUserBook,
   shelfStatus,
   readPages,
@@ -53,6 +59,24 @@ export default function ShelfSelector({
           <span className={css.averageRating}>{averageRating ? averageRating.toFixed(1) : '0.0'}</span>
         </div>
         <span className={css.ratingMeta}>{reviewsCount} {t('books.reviews')}</span>
+      </div>
+
+      <div className={`glass-panel ${css.shelfStatsPanel}`}>
+        <h3 className={css.shelfStatsTitle}>{t('books.shelfStats')}</h3>
+        <div className={css.shelfStatsGrid}>
+          <div className={css.shelfStatCard}>
+            <span className={css.shelfStatValue}>{readRightNowCount}</span>
+            <span className={css.shelfStatLabel}>{t('books.currentlyReading')}</span>
+          </div>
+          <div className={css.shelfStatCard}>
+            <span className={css.shelfStatValue}>{wantToReadCount}</span>
+            <span className={css.shelfStatLabel}>{t('books.wantToRead')}</span>
+          </div>
+          <div className={css.shelfStatCard}>
+            <span className={css.shelfStatValue}>{alreadyReadCount}</span>
+            <span className={css.shelfStatLabel}>{t('books.read')}</span>
+          </div>
+        </div>
       </div>
 
       {showShelf && (

@@ -2,7 +2,7 @@
 
 import React, { use, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, ChevronLeft, Loader2, MessageSquare, Star } from 'lucide-react';
+import { BookOpen, ChevronLeft, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import AdminRedirect from '@/components/common/AdminRedirect';
 import TabSwitcher from '@/components/common/TabSwitcher';
@@ -71,7 +71,9 @@ export default function BookDetails({ params }: PageProps) {
       setComments(commentsRes.data?.data || commentsRes.data || []);
     } catch (err) {
       console.error('Failed to load book info', err);
-      setDetails(null);
+      if (showLoader) {
+        setDetails(null);
+      }
     } finally {
       if (showLoader) setLoading(false);
     }
@@ -104,10 +106,11 @@ export default function BookDetails({ params }: PageProps) {
     setUpdatingShelf(true);
     try {
       const payload = { status: shelfStatus, readPages };
-      const res = details.currentUserBook
-        ? await api.patch(`/user-books/${details.currentUserBook.id}`, payload)
-        : await api.post('/user-books', { bookId, ...payload });
-      setDetails({ ...details, currentUserBook: res.data });
+      const request = details.currentUserBook
+        ? api.patch(`/user-books/${details.currentUserBook.id}`, payload)
+        : api.post('/user-books', { bookId, ...payload });
+      await request;
+      await loadAllDetails(false);
       alert(t('books.shelfUpdated'));
     } catch (err: any) {
       alert(err.response?.data?.message || t('books.updateFailed'));
@@ -121,9 +124,7 @@ export default function BookDetails({ params }: PageProps) {
     setUpdatingShelf(true);
     try {
       await api.delete(`/user-books/${details.currentUserBook.id}`);
-      setDetails({ ...details, currentUserBook: null });
-      setShelfStatus('');
-      setReadPages(0);
+      await loadAllDetails(false);
     } catch (err: any) {
       alert(err.response?.data?.message || t('books.removeFailed'));
     } finally {
@@ -220,7 +221,7 @@ export default function BookDetails({ params }: PageProps) {
   if (loading) return <BookDetailsState message={t('common.loadingBookInfo')} />;
   if (!details) return <BookDetailsNotFound />;
 
-  const { book, averageRating, reviewsCount, commentsCount, currentUserBook } = details;
+  const { book, averageRating, reviewsCount, commentsCount, currentUserBook, readRightNowCount, wantToReadCount, alreadyReadCount } = details;
 
   return (
     <div className={css.appContainer}>
@@ -234,20 +235,23 @@ export default function BookDetails({ params }: PageProps) {
 
         <div className={css.columns}>
           <aside className={css.leftCol}>
-              <ShelfSelector
-                book={book}
-                averageRating={averageRating}
-                reviewsCount={reviewsCount}
-                currentUserBook={currentUserBook}
-                shelfStatus={shelfStatus}
-                readPages={readPages}
-                updatingShelf={updatingShelf}
-                showShelf={Boolean(user) && !isAdmin}
-                onStatusChange={setShelfStatus}
-                onReadPagesChange={setReadPages}
-                onSave={handleUpdateShelf}
-                onRemove={handleRemoveFromShelf}
-              />
+            <ShelfSelector
+              book={book}
+              averageRating={averageRating}
+              reviewsCount={reviewsCount}
+              readRightNowCount={readRightNowCount}
+              wantToReadCount={wantToReadCount}
+              alreadyReadCount={alreadyReadCount}
+              currentUserBook={currentUserBook}
+              shelfStatus={shelfStatus}
+              readPages={readPages}
+              updatingShelf={updatingShelf}
+              showShelf={Boolean(user) && !isAdmin}
+              onStatusChange={setShelfStatus}
+              onReadPagesChange={setReadPages}
+              onSave={handleUpdateShelf}
+              onRemove={handleRemoveFromShelf}
+            />
           </aside>
 
           <section className={css.rightCol}>

@@ -29,6 +29,9 @@ export interface BookDetailsData {
   reviewsCount: number;
   commentsCount: number;
   averageRating: number;
+  readRightNowCount: number;
+  wantToReadCount: number;
+  alreadyReadCount: number;
   currentUserBook: UserBook | null;
 }
 

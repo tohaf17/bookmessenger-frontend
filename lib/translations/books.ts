@@ -32,6 +32,7 @@ export const booksTranslations = {
   'books.reviewFailed': { uk: 'Не вдалося додати відгук', en: 'Review failed' },
   'books.commentFailed': { uk: 'Не вдалося відправити коментар', en: 'Comment failed' },
   'books.replyFailed': { uk: 'Не вдалося надіслати відповідь', en: 'Reply failed' },
+  'books.shelfStats': { uk: 'Статистика полички', en: 'Shelf stats' },
   'books.discussion': { uk: 'Обговорення', en: 'Discussion' },
   'books.reviewList': { uk: 'Рецензії', en: 'Reviews' },
   'books.postComment': { uk: 'Залишити коментар', en: 'Post a Comment' },
