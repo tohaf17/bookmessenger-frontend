@@ -28,6 +28,8 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
+        env:
+          NEXT_PUBLIC_API_URL: 'https://bookmessenger-backend-cpdsfjhsh2daasgs.sc.azurewebsites.net'
 
       - name: Copy static files to standalone
         run: |
